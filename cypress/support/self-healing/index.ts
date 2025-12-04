@@ -111,7 +111,23 @@ export class SelfHealingEngine {
 
     locatorStore.recordHealingEvent(healingEvent)
 
-    // Log the healing event
+    // Log the healing event visually in Cypress
+    Cypress.log({
+      name: '🔧 HEALED',
+      displayName: '🔧 SELF-HEALED',
+      message: `"${elementName}" found via ${result.matchedBy} (${(result.confidence * 100).toFixed(0)}% confidence)`,
+      consoleProps: () => ({
+        '🎯 Element Name': elementName,
+        '❌ Original Locator (broken)': primaryLocator,
+        '✅ Healed Locator': result.locator?.value || 'similarity-based',
+        '🔍 Strategy Used': result.matchedBy,
+        '📊 Confidence': `${(result.confidence * 100).toFixed(1)}%`,
+        '📁 Test File': context.testFile,
+        '🧪 Test Name': context.testName,
+      }),
+    })
+
+    // Also log to terminal
     cy.task('logHealingEvent', healingEvent)
 
     // Update fingerprint with new heal count
