@@ -1,0 +1,23 @@
+{
+  "testUsers": {
+    "valid": {
+      "username": "admin",
+      "password": "password"
+    },
+    "invalid": {
+      "username": "wronguser",
+      "password": "wrongpass"
+    }
+  },
+  "searchTerms": [
+    "electronics",
+    "clothing",
+    "books"
+  ],
+  "todoItems": [
+    "Complete self-healing demo",
+    "Write documentation",
+    "Add more test cases"
+  ]
+}
+

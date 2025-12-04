@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Healing Demo App</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --error: #ef4444;
+      --border: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    input::placeholder {
+      color: var(--text-muted);
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .message {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .message.success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+      display: block;
+    }
+
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+      display: block;
+    }
+
+    .toggle-section {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      border: 1px dashed var(--primary);
+    }
+
+    .toggle-section h3 {
+      font-size: 0.875rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+
+    .item-list {
+      list-style: none;
+      margin-top: 1rem;
+    }
+
+    .item-list li {
+      padding: 0.75rem;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .item-list .delete-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      background: var(--error);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: var(--primary);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      background: var(--bg);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .info-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Self-Healing Demo</h1>
+    <p class="subtitle">Test the self-healing framework with this demo application</p>
+
+    <!-- Login Form Card -->
+    <div class="card">
+      <h2 class="card-title">👤 Login Form</h2>
+      <form id="login-form" data-testid="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username"
+            data-testid="username-input"
+            data-cy="username-input"
+            aria-label="Enter your username"
+            placeholder="Enter username"
+          >
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password"
+            data-testid="password-input"
+            data-cy="password-input"
+            aria-label="Enter your password"
+            placeholder="Enter password"
+          >
+        </div>
+        <div class="btn-group">
+          <button 
+            type="submit" 
+            id="login-btn"
+            data-testid="login-button"
+            data-cy="login-button"
+            aria-label="Login to your account"
+          >
+            Login
+          </button>
+          <button 
+            type="button" 
+            class="btn-secondary"
+            id="reset-btn"
+            data-testid="reset-button"
+            aria-label="Reset form"
+          >
+            Reset
+          </button>
+        </div>
+      </form>
+      <div id="login-message" class="message" role="alert"></div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="card">
+      <h2 class="card-title">🔍 Search Products</h2>
+      <div class="form-group">
+        <label for="search-input">Search</label>
+        <input 
+          type="search" 
+          id="search-input"
+          name="search"
+          data-testid="search-input"
+          placeholder="Search for products..."
+          aria-label="Search products"
+        >
+      </div>
+      <div class="form-group">
+        <label for="category-select">Category</label>
+        <select 
+          id="category-select"
+          name="category"
+          data-testid="category-select"
+          aria-label="Select category"
+        >
+          <option value="">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="clothing">Clothing</option>
+          <option value="books">Books</option>
+        </select>
+      </div>
+      <button 
+        type="button"
+        id="search-btn"
+        data-testid="search-button"
+        aria-label="Search"
+      >
+        Search
+      </button>
+      
+      <ul class="item-list" id="results-list" data-testid="results-list">
+        <!-- Results will appear here -->
+      </ul>
+    </div>
+
+    <!-- Todo Card -->
+    <div class="card">
+      <h2 class="card-title">📝 Todo List</h2>
+      <div class="form-group">
+        <input 
+          type="text" 
+          id="todo-input"
+          data-testid="todo-input"
+          placeholder="Add a new task..."
+          aria-label="New task"
+        >
+      </div>
+      <button 
+        type="button"
+        id="add-todo-btn"
+        data-testid="add-todo-button"
+        aria-label="Add task"
+      >
+        Add Task
+      </button>
+      
+      <ul class="item-list" id="todo-list" data-testid="todo-list">
+        <li data-testid="todo-item">
+          <span>Sample task 1</span>
+          <button class="delete-btn" data-testid="delete-todo" aria-label="Delete task">Delete</button>
+        </li>
+        <li data-testid="todo-item">
+          <span>Sample task 2</span>
+          <button class="delete-btn" data-testid="delete-todo" aria-label="Delete task">Delete</button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Locator Simulator -->
+    <div class="toggle-section">
+      <h3>🧪 Locator Simulator (for testing self-healing)</h3>
+      <p class="info-text">
+        Toggle these options to simulate common scenarios that break locators.
+        The self-healing framework should recover from these changes.
+      </p>
+      <div class="checkbox-group" style="margin-top: 1rem;">
+        <input type="checkbox" id="toggle-ids" onchange="toggleIds()">
+        <label for="toggle-ids" style="margin-bottom: 0;">Remove all IDs (simulates ID changes)</label>
+      </div>
+      <div class="checkbox-group" style="margin-top: 0.5rem;">
+        <input type="checkbox" id="toggle-testids" onchange="toggleTestIds()">
+        <label for="toggle-testids" style="margin-bottom: 0;">Remove data-testid attributes</label>
+      </div>
+      <div class="checkbox-group" style="margin-top: 0.5rem;">
+        <input type="checkbox" id="toggle-classes" onchange="toggleClasses()">
+        <label for="toggle-classes" style="margin-bottom: 0;">Randomize class names</label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Login form handling
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const messageEl = document.getElementById('login-message');
+      
+      if (username === 'admin' && password === 'password') {
+        messageEl.textContent = '✓ Login successful! Welcome, ' + username;
+        messageEl.className = 'message success';
+      } else {
+        messageEl.textContent = '✗ Invalid credentials. Try admin/password';
+        messageEl.className = 'message error';
+      }
+    });
+
+    // Reset button
+    document.getElementById('reset-btn').addEventListener('click', function() {
+      document.getElementById('login-form').reset();
+      document.getElementById('login-message').className = 'message';
+    });
+
+    // Search functionality
+    document.getElementById('search-btn').addEventListener('click', function() {
+      const query = document.getElementById('search-input').value;
+      const category = document.getElementById('category-select').value;
+      const resultsEl = document.getElementById('results-list');
+      
+      const mockResults = [
+        { name: 'Product A', category: 'electronics', price: '$99' },
+        { name: 'Product B', category: 'clothing', price: '$49' },
+        { name: 'Product C', category: 'books', price: '$19' },
+      ].filter(p => !category || p.category === category);
+      
+      resultsEl.innerHTML = mockResults.map(p => `
+        <li data-testid="search-result">
+          <span>${p.name} <span class="badge">${p.price}</span></span>
+          <button class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Add to Cart</button>
+        </li>
+      `).join('');
+    });
+
+    // Todo functionality
+    document.getElementById('add-todo-btn').addEventListener('click', function() {
+      const input = document.getElementById('todo-input');
+      const value = input.value.trim();
+      if (!value) return;
+      
+      const todoList = document.getElementById('todo-list');
+      const li = document.createElement('li');
+      li.setAttribute('data-testid', 'todo-item');
+      li.innerHTML = `
+        <span>${value}</span>
+        <button class="delete-btn" data-testid="delete-todo" aria-label="Delete task" onclick="this.parentElement.remove()">Delete</button>
+      `;
+      todoList.appendChild(li);
+      input.value = '';
+    });
+
+    // Locator simulation functions
+    const originalIds = new Map();
+    const originalTestIds = new Map();
+    const originalClasses = new Map();
+
+    function toggleIds() {
+      const elements = document.querySelectorAll('[id]');
+      const checked = document.getElementById('toggle-ids').checked;
+      
+      elements.forEach((el, index) => {
+        if (checked) {
+          originalIds.set(index, el.id);
+          el.removeAttribute('id');
+        } else if (originalIds.has(index)) {
+          el.id = originalIds.get(index);
+        }
+      });
+    }
+
+    function toggleTestIds() {
+      const elements = document.querySelectorAll('[data-testid]');
+      const checked = document.getElementById('toggle-testids').checked;
+      
+      elements.forEach((el, index) => {
+        if (checked) {
+          originalTestIds.set(index, el.getAttribute('data-testid'));
+          el.removeAttribute('data-testid');
+        } else if (originalTestIds.has(index)) {
+          el.setAttribute('data-testid', originalTestIds.get(index));
+        }
+      });
+    }
+
+    function toggleClasses() {
+      const elements = document.querySelectorAll('[class]');
+      const checked = document.getElementById('toggle-classes').checked;
+      
+      elements.forEach((el, index) => {
+        if (checked) {
+          originalClasses.set(index, el.className);
+          el.className = 'random-' + Math.random().toString(36).substr(2, 9);
+        } else if (originalClasses.has(index)) {
+          el.className = originalClasses.get(index);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+

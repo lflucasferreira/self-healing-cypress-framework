@@ -1,0 +1,33 @@
+{
+  "name": "self-healing-cypress-framework",
+  "version": "1.0.0",
+  "description": "A self-healing E2E test framework built with Cypress and TypeScript that automatically recovers from broken locators using AI-inspired element matching",
+  "author": "Lucas Ferreira",
+  "license": "MIT",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "demo:start": "npx http-server src/demo-app -p 3333 -c-1",
+    "test": "npm run cy:run",
+    "test:headed": "cypress run --headed"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "cypress": "^13.6.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "cypress",
+    "self-healing",
+    "test-automation",
+    "e2e-testing",
+    "ai-testing",
+    "qa-automation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LFLucasFerreira/self-healing-cypress-framework"
+  }
+}
+
